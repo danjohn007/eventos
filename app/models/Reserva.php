@@ -16,19 +16,29 @@ class Reserva {
      */
     public function create($data) {
         try {
-            $sql = "INSERT INTO reservaciones (nombre_completo, email, telefono, fecha_evento, numero_asistentes, tipo_evento, estatus, fecha_creacion) 
-                    VALUES (:nombre_completo, :email, :telefono, :fecha_evento, :numero_asistentes, :tipo_evento, 'Pendiente', CURRENT_TIMESTAMP)";
+            // Generate unique confirmation code
+            $confirmationCode = $this->generateConfirmationCode();
+            
+            $sql = "INSERT INTO reservaciones (nombre_completo, email, telefono, fecha_evento, numero_asistentes, tipo_evento, estatus, codigo_confirmacion, fecha_creacion) 
+                    VALUES (:nombre_completo, :email, :telefono, :fecha_evento, :numero_asistentes, :tipo_evento, 'Pendiente', :codigo_confirmacion, CURRENT_TIMESTAMP)";
             
             $stmt = $this->db->prepare($sql);
             
-            return $stmt->execute([
+            $result = $stmt->execute([
                 ':nombre_completo' => $data['nombre_completo'],
                 ':email' => $data['email'],
                 ':telefono' => $data['telefono'],
                 ':fecha_evento' => $data['fecha_evento'],
                 ':numero_asistentes' => $data['numero_asistentes'],
-                ':tipo_evento' => $data['tipo_evento']
+                ':tipo_evento' => $data['tipo_evento'],
+                ':codigo_confirmacion' => $confirmationCode
             ]);
+            
+            if ($result) {
+                return $this->db->lastInsertId();
+            }
+            
+            return false;
         } catch (PDOException $e) {
             error_log("Error creating reservation: " . $e->getMessage());
             return false;
@@ -207,6 +217,76 @@ class Reserva {
         }
         
         return $errors;
+    }
+    
+    /**
+     * Generate a unique confirmation code
+     */
+    private function generateConfirmationCode() {
+        do {
+            // Generate a secure random 8-character code using alphanumeric characters
+            $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $code = '';
+            for ($i = 0; $i < 8; $i++) {
+                $code .= $characters[random_int(0, strlen($characters) - 1)];
+            }
+            
+            // Check if code already exists
+            $exists = $this->codeExists($code);
+        } while ($exists);
+        
+        return $code;
+    }
+    
+    /**
+     * Check if confirmation code already exists
+     */
+    private function codeExists($code) {
+        try {
+            $sql = "SELECT COUNT(*) as count FROM reservaciones WHERE codigo_confirmacion = :code";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':code' => $code]);
+            
+            $result = $stmt->fetch();
+            return $result['count'] > 0;
+        } catch (PDOException $e) {
+            error_log("Error checking code existence: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get reservation by ID
+     */
+    public function getById($id) {
+        try {
+            $sql = "SELECT * FROM reservaciones WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            
+            $stmt->execute([':id' => $id]);
+            
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log("Error getting reservation by ID: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get reservation by confirmation code
+     */
+    public function getByConfirmationCode($code) {
+        try {
+            $sql = "SELECT * FROM reservaciones WHERE codigo_confirmacion = :code";
+            $stmt = $this->db->prepare($sql);
+            
+            $stmt->execute([':code' => $code]);
+            
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log("Error getting reservation by confirmation code: " . $e->getMessage());
+            return false;
+        }
     }
 }
 ?>
