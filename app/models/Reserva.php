@@ -151,6 +151,26 @@ class Reserva {
     }
     
     /**
+     * Get reservation by ID and email for QR access validation
+     */
+    public function getByIdAndEmail($id, $email) {
+        try {
+            $sql = "SELECT * FROM reservaciones WHERE id = :id AND email = :email";
+            $stmt = $this->db->prepare($sql);
+            
+            $stmt->execute([
+                ':id' => $id,
+                ':email' => $email
+            ]);
+            
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log("Error getting reservation by ID and email: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
      * Validate reservation data
      */
     public function validate($data) {
