@@ -71,7 +71,7 @@
                         </div>
                         
                         <div class="mt-4">
-                            <a href="/eventos/public/" class="btn btn-primary btn-lg me-3">
+                            <a href="/" class="btn btn-primary btn-lg me-3">
                                 <i class="fas fa-plus me-2"></i>
                                 Nueva Reservación
                             </a>
@@ -98,7 +98,7 @@
         // Auto redirect after 30 seconds
         setTimeout(function() {
             if (confirm('¿Desea realizar otra reservación?')) {
-                window.location.href = '/eventos/public/';
+                window.location.href = '/';
             }
         }, 30000);
     </script>

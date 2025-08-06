@@ -70,7 +70,7 @@
                     </div>
                     <div class="card-footer text-center">
                         <small class="text-muted">
-                            <a href="/eventos/public/" class="text-decoration-none">
+                            <a href="/" class="text-decoration-none">
                                 <i class="fas fa-arrow-left me-1"></i>
                                 Volver al formulario de reservación
                             </a>

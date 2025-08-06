@@ -17,16 +17,43 @@ class Database {
     
     private function __construct() {
         try {
-            $dsn = "mysql:host={$this->host};dbname={$this->database};charset={$this->charset}";
+            // For development/testing, use SQLite if MySQL is not available
+            if ($this->isInDevelopment()) {
+                $dbPath = __DIR__ . '/../storage/database.sqlite';
+                $this->ensureStorageDirectory();
+                $dsn = "sqlite:{$dbPath}";
+                $this->connection = new PDO($dsn);
+            } else {
+                // Production MySQL connection
+                $dsn = "mysql:host={$this->host};dbname={$this->database};charset={$this->charset}";
+                $this->connection = new PDO($dsn, $this->username, $this->password);
+            }
+            
             $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ];
             
-            $this->connection = new PDO($dsn, $this->username, $this->password, $options);
+            foreach ($options as $option => $value) {
+                $this->connection->setAttribute($option, $value);
+            }
         } catch (PDOException $e) {
             throw new Exception("Database connection failed: " . $e->getMessage());
+        }
+    }
+    
+    private function isInDevelopment() {
+        return !isset($_SERVER['HTTP_HOST']) || 
+               strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
+               strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false ||
+               strpos($_SERVER['HTTP_HOST'], 'fix360.app') === false;
+    }
+    
+    private function ensureStorageDirectory() {
+        $storageDir = __DIR__ . '/../storage';
+        if (!is_dir($storageDir)) {
+            mkdir($storageDir, 0755, true);
         }
     }
     

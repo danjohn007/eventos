@@ -33,7 +33,7 @@ class ReservaController {
         // Validate CSRF token
         if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
             $_SESSION['form_errors'] = ['Token de seguridad inválido. Por favor, inténtelo de nuevo.'];
-            header('Location: /eventos/public/');
+            header('Location: /');
             exit;
         }
         
@@ -53,7 +53,7 @@ class ReservaController {
         if (!empty($errors)) {
             $_SESSION['form_errors'] = $errors;
             $_SESSION['form_data'] = $data;
-            header('Location: /eventos/public/');
+            header('Location: /');
             exit;
         }
         
@@ -61,12 +61,12 @@ class ReservaController {
         if ($this->reservaModel->create($data)) {
             $_SESSION['success_message'] = 'Su reservación ha sido registrada exitosamente. En breve nos pondremos en contacto con usted.';
             $_SESSION['reservation_data'] = $data;
-            header('Location: /eventos/public/?route=reserva/success');
+            header('Location: /?route=reserva/success');
             exit;
         } else {
             $_SESSION['form_errors'] = ['Error al procesar la reservación. Por favor, inténtelo de nuevo.'];
             $_SESSION['form_data'] = $data;
-            header('Location: /eventos/public/');
+            header('Location: /');
             exit;
         }
     }
@@ -79,7 +79,7 @@ class ReservaController {
         $reservationData = $_SESSION['reservation_data'] ?? [];
         
         if (empty($successMessage)) {
-            header('Location: /eventos/public/');
+            header('Location: /');
             exit;
         }
         

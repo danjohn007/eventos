@@ -40,7 +40,7 @@ class Admin {
      */
     private function updateLastLogin($userId) {
         try {
-            $sql = "UPDATE admin_users SET ultimo_acceso = NOW() WHERE id = :id";
+            $sql = "UPDATE admin_users SET ultimo_acceso = CURRENT_TIMESTAMP WHERE id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':id' => $userId]);
         } catch (PDOException $e) {
@@ -92,7 +92,7 @@ class Admin {
                 $defaultPassword = password_hash('admin123', PASSWORD_DEFAULT);
                 
                 $sql = "INSERT INTO admin_users (username, password, nombre_completo, activo, fecha_creacion) 
-                        VALUES (:username, :password, :nombre_completo, 1, NOW())";
+                        VALUES (:username, :password, :nombre_completo, 1, CURRENT_TIMESTAMP)";
                 $stmt = $this->db->prepare($sql);
                 
                 return $stmt->execute([
@@ -116,11 +116,11 @@ class Admin {
         try {
             // Create admin_users table
             $sql = "CREATE TABLE IF NOT EXISTS admin_users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username VARCHAR(50) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 nombre_completo VARCHAR(100) NOT NULL,
-                activo TINYINT(1) DEFAULT 1,
+                activo INTEGER DEFAULT 1,
                 fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 ultimo_acceso TIMESTAMP NULL
             )";
@@ -128,17 +128,17 @@ class Admin {
             
             // Create reservaciones table
             $sql = "CREATE TABLE IF NOT EXISTS reservaciones (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre_completo VARCHAR(100) NOT NULL,
                 email VARCHAR(100) NOT NULL,
                 telefono VARCHAR(20) NOT NULL,
                 fecha_evento DATE NOT NULL,
-                numero_asistentes INT NOT NULL,
+                numero_asistentes INTEGER NOT NULL,
                 tipo_evento VARCHAR(50) NOT NULL,
-                estatus ENUM('Pendiente', 'Confirmada', 'Cancelada') DEFAULT 'Pendiente',
+                estatus VARCHAR(20) DEFAULT 'Pendiente' CHECK (estatus IN ('Pendiente', 'Confirmada', 'Cancelada')),
                 comentarios TEXT NULL,
                 fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )";
             $this->db->exec($sql);
             

@@ -17,7 +17,7 @@ class Reserva {
     public function create($data) {
         try {
             $sql = "INSERT INTO reservaciones (nombre_completo, email, telefono, fecha_evento, numero_asistentes, tipo_evento, estatus, fecha_creacion) 
-                    VALUES (:nombre_completo, :email, :telefono, :fecha_evento, :numero_asistentes, :tipo_evento, 'Pendiente', NOW())";
+                    VALUES (:nombre_completo, :email, :telefono, :fecha_evento, :numero_asistentes, :tipo_evento, 'Pendiente', CURRENT_TIMESTAMP)";
             
             $stmt = $this->db->prepare($sql);
             

@@ -23,7 +23,7 @@ class AdminController {
     public function showLogin() {
         // Redirect if already logged in
         if ($this->adminModel->isLoggedIn()) {
-            header('Location: /eventos/public/?route=admin/dashboard');
+            header('Location: /?route=admin/dashboard');
             exit;
         }
         
@@ -41,7 +41,7 @@ class AdminController {
         // Validate CSRF token
         if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
             $_SESSION['login_error'] = 'Token de seguridad inválido.';
-            header('Location: /eventos/public/?route=admin');
+            header('Location: /?route=admin');
             exit;
         }
         
@@ -50,7 +50,7 @@ class AdminController {
         
         if (empty($username) || empty($password)) {
             $_SESSION['login_error'] = 'Usuario y contraseña son requeridos.';
-            header('Location: /eventos/public/?route=admin');
+            header('Location: /?route=admin');
             exit;
         }
         
@@ -58,11 +58,11 @@ class AdminController {
         
         if ($user) {
             $this->adminModel->login($user);
-            header('Location: /eventos/public/?route=admin/dashboard');
+            header('Location: /?route=admin/dashboard');
             exit;
         } else {
             $_SESSION['login_error'] = 'Usuario o contraseña incorrectos.';
-            header('Location: /eventos/public/?route=admin');
+            header('Location: /?route=admin');
             exit;
         }
     }
@@ -73,7 +73,7 @@ class AdminController {
     public function dashboard() {
         // Check if logged in
         if (!$this->adminModel->isLoggedIn()) {
-            header('Location: /eventos/public/?route=admin');
+            header('Location: /?route=admin');
             exit;
         }
         
@@ -109,14 +109,14 @@ class AdminController {
     public function updateStatus() {
         // Check if logged in
         if (!$this->adminModel->isLoggedIn()) {
-            header('Location: /eventos/public/?route=admin');
+            header('Location: /?route=admin');
             exit;
         }
         
         // Validate CSRF token
         if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
             $_SESSION['admin_error'] = 'Token de seguridad inválido.';
-            header('Location: /eventos/public/?route=admin/dashboard');
+            header('Location: /?route=admin/dashboard');
             exit;
         }
         
@@ -135,7 +135,7 @@ class AdminController {
             $_SESSION['admin_error'] = 'Datos inválidos.';
         }
         
-        header('Location: /eventos/public/?route=admin/dashboard');
+        header('Location: /?route=admin/dashboard');
         exit;
     }
     
@@ -145,14 +145,14 @@ class AdminController {
     public function deleteReservation() {
         // Check if logged in
         if (!$this->adminModel->isLoggedIn()) {
-            header('Location: /eventos/public/?route=admin');
+            header('Location: /?route=admin');
             exit;
         }
         
         // Validate CSRF token
         if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
             $_SESSION['admin_error'] = 'Token de seguridad inválido.';
-            header('Location: /eventos/public/?route=admin/dashboard');
+            header('Location: /?route=admin/dashboard');
             exit;
         }
         
@@ -168,7 +168,7 @@ class AdminController {
             $_SESSION['admin_error'] = 'ID de reservación inválido.';
         }
         
-        header('Location: /eventos/public/?route=admin/dashboard');
+        header('Location: /?route=admin/dashboard');
         exit;
     }
     
@@ -177,7 +177,7 @@ class AdminController {
      */
     public function logout() {
         $this->adminModel->logout();
-        header('Location: /eventos/public/?route=admin');
+        header('Location: /?route=admin');
         exit;
     }
 }
