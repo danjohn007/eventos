@@ -77,40 +77,18 @@
                         </small>
                     </div>
                 </div>
-                
-                <!-- Development note -->
-                <div class="alert alert-info mt-3" id="dev-info">
-                    <h6><i class="fas fa-info-circle me-2"></i>Información de desarrollo:</h6>
-                    <p class="mb-1"><strong>Usuario por defecto:</strong> admin</p>
-                    <p class="mb-0"><strong>Contraseña por defecto:</strong> admin123</p>
-                    <small class="text-muted">Esta información solo se muestra en modo desarrollo.</small>
-                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Hide dev info after 10 seconds or when form is submitted
-        setTimeout(function() {
-            const devInfo = document.getElementById('dev-info');
-            if (devInfo) {
-                devInfo.style.display = 'none';
-            }
-        }, 10000);
-        
         // Form validation
         (function() {
             'use strict';
             
             const form = document.querySelector('form');
             form.addEventListener('submit', function(event) {
-                // Hide dev info when submitting
-                const devInfo = document.getElementById('dev-info');
-                if (devInfo) {
-                    devInfo.style.display = 'none';
-                }
-                
                 if (!form.checkValidity()) {
                     event.preventDefault();
                     event.stopPropagation();

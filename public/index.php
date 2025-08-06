@@ -42,6 +42,38 @@ function validateCSRFToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
 
+// URL helper for relative redirects
+function getBaseUrl() {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $scriptName = $_SERVER['SCRIPT_NAME'];
+    $basePath = dirname($scriptName);
+    
+    // Remove 'public' from path if present
+    if (basename($basePath) === 'public') {
+        $basePath = dirname($basePath);
+    }
+    
+    // Ensure no double slashes and proper trailing
+    $basePath = '/' . trim($basePath, '/');
+    if ($basePath === '/') {
+        $basePath = '';
+    }
+    
+    return $basePath;
+}
+
+function buildUrl($route = '') {
+    $baseUrl = getBaseUrl();
+    $route = ltrim($route, '/');
+    
+    if (empty($route)) {
+        return $baseUrl . '/';
+    }
+    
+    return $baseUrl . '/?route=' . $route;
+}
+
 // Simple router
 $request = $_GET['route'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
