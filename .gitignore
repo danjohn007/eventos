@@ -12,6 +12,9 @@ public/libs/phpqrcode/*.zip
 .DS_Store
 Thumbs.db
 
+# Database files (development/testing)
+storage/database.sqlite
+
 # IDE files
 .vscode/
 .idea/
