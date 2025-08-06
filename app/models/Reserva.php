@@ -16,19 +16,29 @@ class Reserva {
      */
     public function create($data) {
         try {
-            $sql = "INSERT INTO reservaciones (nombre_completo, email, telefono, fecha_evento, numero_asistentes, tipo_evento, estatus, fecha_creacion) 
-                    VALUES (:nombre_completo, :email, :telefono, :fecha_evento, :numero_asistentes, :tipo_evento, 'Pendiente', CURRENT_TIMESTAMP)";
+            // Generate unique QR code
+            $codigoQr = $this->generateUniqueQRCode();
+            
+            $sql = "INSERT INTO reservaciones (nombre_completo, email, telefono, fecha_evento, numero_asistentes, tipo_evento, codigo_qr, estatus, fecha_creacion) 
+                    VALUES (:nombre_completo, :email, :telefono, :fecha_evento, :numero_asistentes, :tipo_evento, :codigo_qr, 'Pendiente', CURRENT_TIMESTAMP)";
             
             $stmt = $this->db->prepare($sql);
             
-            return $stmt->execute([
+            $result = $stmt->execute([
                 ':nombre_completo' => $data['nombre_completo'],
                 ':email' => $data['email'],
                 ':telefono' => $data['telefono'],
                 ':fecha_evento' => $data['fecha_evento'],
                 ':numero_asistentes' => $data['numero_asistentes'],
-                ':tipo_evento' => $data['tipo_evento']
+                ':tipo_evento' => $data['tipo_evento'],
+                ':codigo_qr' => $codigoQr
             ]);
+            
+            if ($result) {
+                return $codigoQr; // Return the QR code instead of just true
+            }
+            
+            return false;
         } catch (PDOException $e) {
             error_log("Error creating reservation: " . $e->getMessage());
             return false;
@@ -187,6 +197,43 @@ class Reserva {
         }
         
         return $errors;
+    }
+    
+    /**
+     * Generate a unique QR code for the reservation
+     */
+    private function generateUniqueQRCode() {
+        do {
+            // Generate a unique code using timestamp and random bytes
+            $timestamp = time();
+            $randomBytes = bin2hex(random_bytes(8));
+            $codigoQr = substr(md5($timestamp . $randomBytes), 0, 16);
+            
+            // Check if code already exists
+            $sql = "SELECT COUNT(*) as count FROM reservaciones WHERE codigo_qr = :codigo_qr";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':codigo_qr' => $codigoQr]);
+            $result = $stmt->fetch();
+            
+        } while ($result['count'] > 0);
+        
+        return strtoupper($codigoQr);
+    }
+    
+    /**
+     * Find reservation by QR code
+     */
+    public function findByQRCode($codigoQr) {
+        try {
+            $sql = "SELECT * FROM reservaciones WHERE codigo_qr = :codigo_qr";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':codigo_qr' => $codigoQr]);
+            
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log("Error finding reservation by QR code: " . $e->getMessage());
+            return false;
+        }
     }
 }
 ?>

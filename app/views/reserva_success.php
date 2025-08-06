@@ -57,6 +57,33 @@
                             <?php endif; ?>
                         </div>
                         
+                        <?php if (!empty($qrCode)): ?>
+                        <div class="alert alert-primary text-center mt-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-qrcode me-2"></i>
+                                Código QR de Acceso
+                            </h5>
+                            <p class="mb-3">Presente este código QR en el evento para validar su reservación:</p>
+                            
+                            <div class="qr-code-container mb-3">
+                                <img src="<?php echo QRCodeHelper::generateReservationQRURL($qrCode, $reservationData, 200); ?>" 
+                                     alt="Código QR de la reservación" 
+                                     class="border border-2 border-dark rounded p-2 bg-white"
+                                     style="max-width: 200px;">
+                            </div>
+                            
+                            <div class="bg-light p-3 rounded">
+                                <strong>Código de Reservación:</strong> 
+                                <code class="fs-5 text-primary"><?php echo htmlspecialchars($qrCode); ?></code>
+                            </div>
+                            
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Guarde este código QR o tome una captura de pantalla para presentarlo en el evento.
+                            </small>
+                        </div>
+                        <?php endif; ?>
+                        
                         <p class="lead mb-4">
                             <?php echo htmlspecialchars($successMessage); ?>
                         </p>
@@ -85,7 +112,11 @@
                         <small>
                             <i class="fas fa-info-circle me-1"></i>
                             Guarde esta información para sus registros. 
-                            Número de referencia: <strong>REF-<?php echo date('Ymd') . '-' . substr(md5($reservationData['email'] ?? ''), 0, 6); ?></strong>
+                            <?php if (!empty($qrCode)): ?>
+                                Código de reservación: <strong><?php echo htmlspecialchars($qrCode); ?></strong>
+                            <?php else: ?>
+                                Número de referencia: <strong>REF-<?php echo date('Ymd') . '-' . substr(md5($reservationData['email'] ?? ''), 0, 6); ?></strong>
+                            <?php endif; ?>
                         </small>
                     </div>
                 </div>

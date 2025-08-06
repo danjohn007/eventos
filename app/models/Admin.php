@@ -135,12 +135,20 @@ class Admin {
                 fecha_evento DATE NOT NULL,
                 numero_asistentes INTEGER NOT NULL,
                 tipo_evento VARCHAR(50) NOT NULL,
+                codigo_qr VARCHAR(32) UNIQUE NULL,
                 estatus VARCHAR(20) DEFAULT 'Pendiente' CHECK (estatus IN ('Pendiente', 'Confirmada', 'Cancelada')),
                 comentarios TEXT NULL,
                 fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )";
             $this->db->exec($sql);
+            
+            // Add codigo_qr column if table exists but column doesn't
+            try {
+                $this->db->exec("ALTER TABLE reservaciones ADD COLUMN codigo_qr VARCHAR(32) UNIQUE");
+            } catch (PDOException $e) {
+                // Column already exists, ignore error
+            }
             
             return true;
         } catch (PDOException $e) {

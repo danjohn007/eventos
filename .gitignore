@@ -1,0 +1,26 @@
+# Storage directory (contains SQLite database)
+storage/
+
+# Vendor directory (Composer dependencies) 
+vendor/
+
+# Log files
+*.log
+
+# Environment files
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+/tmp/
+*.tmp

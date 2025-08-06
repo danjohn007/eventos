@@ -58,9 +58,11 @@ class ReservaController {
         }
         
         // Save reservation
-        if ($this->reservaModel->create($data)) {
+        $codigoQr = $this->reservaModel->create($data);
+        if ($codigoQr) {
             $_SESSION['success_message'] = 'Su reservación ha sido registrada exitosamente. En breve nos pondremos en contacto con usted.';
             $_SESSION['reservation_data'] = $data;
+            $_SESSION['reservation_qr_code'] = $codigoQr;
             header('Location: /?route=reserva/success');
             exit;
         } else {
@@ -77,6 +79,7 @@ class ReservaController {
     public function showSuccess() {
         $successMessage = $_SESSION['success_message'] ?? '';
         $reservationData = $_SESSION['reservation_data'] ?? [];
+        $qrCode = $_SESSION['reservation_qr_code'] ?? '';
         
         if (empty($successMessage)) {
             header('Location: /');
@@ -86,6 +89,7 @@ class ReservaController {
         // Clear session data after displaying
         unset($_SESSION['success_message']);
         unset($_SESSION['reservation_data']);
+        unset($_SESSION['reservation_qr_code']);
         
         include '../app/views/reserva_success.php';
     }

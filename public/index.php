@@ -18,6 +18,9 @@ require_once '../config/database.php';
 require_once '../app/models/Reserva.php';
 require_once '../app/models/Admin.php';
 
+// Include helpers
+require_once '../app/helpers/QRCodeHelper.php';
+
 // Include controllers
 require_once '../app/controllers/ReservaController.php';
 require_once '../app/controllers/AdminController.php';
@@ -96,6 +99,43 @@ switch ($request) {
         $controller = new AdminController();
         if ($method === 'POST') {
             $controller->deleteReservation();
+        }
+        break;
+        
+    case 'api/validate-qr':
+        // Simple QR validation endpoint
+        header('Content-Type: application/json');
+        if ($method === 'POST') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            $qrCode = $input['codigo'] ?? $_POST['codigo'] ?? '';
+            
+            if (empty($qrCode)) {
+                echo json_encode(['error' => 'Código QR requerido']);
+                exit;
+            }
+            
+            $reservaModel = new Reserva();
+            $reservation = $reservaModel->findByQRCode($qrCode);
+            
+            if ($reservation) {
+                echo json_encode([
+                    'success' => true,
+                    'reservation' => [
+                        'id' => $reservation['id'],
+                        'nombre_completo' => $reservation['nombre_completo'],
+                        'email' => $reservation['email'],
+                        'fecha_evento' => $reservation['fecha_evento'],
+                        'numero_asistentes' => $reservation['numero_asistentes'],
+                        'tipo_evento' => $reservation['tipo_evento'],
+                        'estatus' => $reservation['estatus'],
+                        'fecha_creacion' => $reservation['fecha_creacion']
+                    ]
+                ]);
+            } else {
+                echo json_encode(['error' => 'Código QR no válido o reservación no encontrada']);
+            }
+        } else {
+            echo json_encode(['error' => 'Método no permitido']);
         }
         break;
         
