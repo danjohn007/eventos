@@ -58,10 +58,10 @@ class ReservaController {
         }
         
         // Save reservation
-        if ($this->reservaModel->create($data)) {
-            $_SESSION['success_message'] = 'Su reservación ha sido registrada exitosamente. En breve nos pondremos en contacto con usted.';
-            $_SESSION['reservation_data'] = $data;
-            header('Location: /?route=reserva/success');
+        $reservation_id = $this->reservaModel->create($data);
+        if ($reservation_id) {
+            // Redirect to confirmation page with reservation ID
+            header("Location: confirmacion.php?id=" . urlencode($reservation_id));
             exit;
         } else {
             $_SESSION['form_errors'] = ['Error al procesar la reservación. Por favor, inténtelo de nuevo.'];

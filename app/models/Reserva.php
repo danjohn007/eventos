@@ -13,6 +13,7 @@ class Reserva {
     
     /**
      * Create a new reservation
+     * @return int|false Returns the reservation ID on success, false on failure
      */
     public function create($data) {
         try {
@@ -21,7 +22,7 @@ class Reserva {
             
             $stmt = $this->db->prepare($sql);
             
-            return $stmt->execute([
+            $success = $stmt->execute([
                 ':nombre_completo' => $data['nombre_completo'],
                 ':email' => $data['email'],
                 ':telefono' => $data['telefono'],
@@ -29,6 +30,13 @@ class Reserva {
                 ':numero_asistentes' => $data['numero_asistentes'],
                 ':tipo_evento' => $data['tipo_evento']
             ]);
+            
+            // Return the ID of the newly created reservation
+            if ($success) {
+                return $this->db->lastInsertId();
+            } else {
+                return false;
+            }
         } catch (PDOException $e) {
             error_log("Error creating reservation: " . $e->getMessage());
             return false;
@@ -166,6 +174,25 @@ class Reserva {
             return $stmt->fetch();
         } catch (PDOException $e) {
             error_log("Error getting reservation by ID and email: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get reservation by ID
+     * @param int $id Reservation ID
+     * @return array|false Returns reservation data on success, false on failure
+     */
+    public function getById($id) {
+        try {
+            $sql = "SELECT * FROM reservaciones WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            
+            $stmt->execute([':id' => $id]);
+            
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log("Error getting reservation by ID: " . $e->getMessage());
             return false;
         }
     }
